@@ -21,8 +21,8 @@ class Base64ImageField(serializers.ImageField):
 class PostSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
     image = Base64ImageField(required=False, allow_null=True)
-    group = serializers.PrimaryKeyRelatedField(allow_null=True,
-                                               queryset=Group.objects.all())
+    group = serializers.PrimaryKeyRelatedField(
+        required=False, allow_null=True, queryset=Group.objects.all())
 
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date', 'image', 'group')
@@ -49,10 +49,10 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
+    user = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    follwing = serializers.SlugRelatedField(
+    following = serializers.SlugRelatedField(
         slug_field='username',
         queryset=User.objects.all()
     )
@@ -62,8 +62,13 @@ class FollowSerializer(serializers.ModelSerializer):
         fields = ('user', 'following')
 
     def validate_following(self, value):
-        if self.context['request'].user == value:
+        user = self.context['request'].user
+        if user == value:
             raise serializers.ValidationError(
                 "Нельзя подписаться на самого себя"
             )
+        if Follow.objects.filter(user=user, following=value).exists():
+            raise serializers.ValidationError({
+                'following': 'Вы уже подписаны на этого пользователя'
+            })
         return value

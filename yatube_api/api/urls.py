@@ -10,7 +10,7 @@ router.register(r'groups', GroupViewSet, basename='api-groups')
 comments_router = routers.NestedSimpleRouter(
     router,
     r'posts',
-    lookup='post_id',
+    lookup='post',
 )
 comments_router.register('comments', CommentViewSet, basename='post-comments')
 
