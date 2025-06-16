@@ -72,11 +72,11 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 class FollowViewSet(ListCreateAPIView):
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter, )
-    search_fields = ('following', )
+    search_fields = ('following__username', )
 
     def get_queryset(self):
         return Follow.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        author = self.request.user
-        serializer.save(author=author)
+        user = self.request.user
+        serializer.save(user=user)
