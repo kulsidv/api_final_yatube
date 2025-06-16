@@ -1,9 +1,8 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView
-from rest_framework import filters
 from django.shortcuts import get_object_or_404
 
 from posts.models import Post, Comment, Group, Follow
@@ -67,6 +66,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (permissions.AllowAny, )
 
 
 class FollowViewSet(ListCreateAPIView):
